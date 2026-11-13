@@ -1,10 +1,9 @@
 package lms.service;
 
-import lms.model.Book;
-import lms.model.DVD;
+import lms.exception.ItemNotAvailableException;
+import lms.exception.MemberNotFoundException;
 import lms.model.LibraryItem;
 import lms.model.Member;
-
 import lms.Loanable;
 import lms.Reservable;
 
@@ -13,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class Library {
-    private List<LibraryItem> items;
-    private List<Member> members;
+    private final List<LibraryItem> items;
+    private final List<Member> members;
 
     public Library() {
         this.items = new ArrayList<>();
@@ -23,62 +22,51 @@ public class Library {
 
     public void addItem(LibraryItem item) {
         items.add(item);
-        System.out.println("Added via addItem(LibraryItem): " + item.getTitle());
-    }
-
-    public void addItem(Book book) {
-        items.add(book);
-        System.out.println("Added via addItem(Book): " + book.getTitle());
-    }
-
-    public void addItem(DVD dvd) {
-        items.add(dvd);
-        System.out.println("Added via addItem(DVD): " + dvd.getTitle());
     }
 
     public void addMember(Member member) {
         members.add(member);
     }
 
-    public void printAllLateFees(int daysLate) {
-        System.out.println("--- Late fees if " + daysLate + " day(s) late ---");
-        for (LibraryItem item : items) {
-            double fee = item.calculateLateFee(daysLate);
-            System.out.println(item.getTitle() + ": " + fee);
+    public Member findMember(String memberId) {
+        for (Member m : members) {
+            if (m.getMemberId().equals(memberId)) {
+                return m;
+            }
         }
+        throw new MemberNotFoundException(memberId);
     }
 
-    // නව මෙතඩ්: ණයට දීම (Lend)
-    public void lend(Loanable thing, Member member) {
+    public LibraryItem findItem(String itemId) throws ItemNotAvailableException {
+        for (LibraryItem item : items) {
+            if (item.getId().equals(itemId)) {
+                return item;
+            }
+        }
+        throw new ItemNotAvailableException("No item with id " + itemId);
+    }
+
+    public void borrowItem(String itemId, String memberId) throws ItemNotAvailableException {
+        LibraryItem item = findItem(itemId);
+        Member member = findMember(memberId);
+        lend(item, member);
+    }
+
+    public void returnItem(String itemId) throws ItemNotAvailableException {
+        LibraryItem item = findItem(itemId);
+        item.returnItem();
+    }
+
+    public void lend(Loanable thing, Member member) throws ItemNotAvailableException {
         thing.loan(member);
     }
 
-    // නව මෙතඩ්: වෙන්කරවා ගැනීම (Reserve) - instanceof පාවිච්චි කරමින්
-    public void reserveIfPossible(LibraryItem item, Member member) {
-        if (item instanceof Reservable) {
-            Reservable reservableItem = (Reservable) item;
-            reservableItem.reserve(member);
-        } else {
-            System.out.println(item.getTitle() + " cannot be reserved.");
-        }
-    }
-
-    // නව මෙතඩ්: සාමාජිකයින් ක්‍රියාකාරීත්වය අනුව අනුපිළිවෙලට මුද්‍රණය කිරීම
     public void printMembersByActivity() {
         System.out.println("--- Members ranked by activity ---");
         List<Member> sortedMembers = new ArrayList<>(members);
         Collections.sort(sortedMembers);
         for (Member m : sortedMembers) {
             System.out.println(m.getName() + " (" + m.getBorrowedCount() + " borrowed)");
-        }
-    }
-
-    public void streamIfPossible(LibraryItem item) {
-        if (item instanceof DVD) {
-            DVD dvd = (DVD) item;
-            System.out.println("Streaming \"" + dvd.getTitle() + "\" (" + dvd.getDurationMinutes() + " min)...");
-        } else {
-            System.out.println(item.getTitle() + " cannot be streamed it isn't a DVD.");
         }
     }
 }
