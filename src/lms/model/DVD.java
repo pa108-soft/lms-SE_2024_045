@@ -1,4 +1,3 @@
-
 package lms.model;
 
 public class DVD extends LibraryItem {
@@ -13,7 +12,10 @@ public class DVD extends LibraryItem {
         return durationMinutes;
     }
 
-    @Override
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
+
     public double calculateLateFee(int daysLate) {
         return daysLate * 25.0;
     }

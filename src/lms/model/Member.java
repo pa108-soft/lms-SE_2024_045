@@ -1,17 +1,16 @@
-
 package lms.model;
 
-public class Member {
+public class Member implements Comparable<Member> {
     private String memberId;
     private String name;
     private int borrowedCount;
     private int maxBorrowLimit;
 
     public Member(String memberId, String name, int maxBorrowLimit) {
-        setMemberId(memberId);
+        this.memberId = memberId;
         setName(name);
-        this.maxBorrowLimit = maxBorrowLimit;
         this.borrowedCount = 0;
+        this.maxBorrowLimit = maxBorrowLimit;
     }
 
     public String getMemberId() {
@@ -22,6 +21,14 @@ public class Member {
         return name;
     }
 
+    public void setName(String name) {
+        if (name != null && !name.trim().isEmpty()) {
+            this.name = name;
+        } else {
+            this.name = "Unknown Name";
+        }
+    }
+
     public int getBorrowedCount() {
         return borrowedCount;
     }
@@ -30,37 +37,17 @@ public class Member {
         return maxBorrowLimit;
     }
 
-    public void setMemberId(String memberId) {
-        if (memberId == null || memberId.isBlank()) {
-            throw new IllegalArgumentException("Member ID cannot be blank");
-        }
-        this.memberId = memberId;
-    }
-
-    public void setName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Name cannot be blank");
-        }
-        this.name = name;
-    }
-
-    public void setBorrowedCount(int borrowedCount) {
-        if (borrowedCount < 0) {
-            throw new IllegalArgumentException("Borrowed count cannot be negative");
-        }
-        this.borrowedCount = borrowedCount;
-    }
-
     public void incrementBorrowedCount() {
-        setBorrowedCount(borrowedCount + 1);
+        if (borrowedCount < maxBorrowLimit) {
+            borrowedCount++;
+        }
     }
 
-    @Override
+    public int compareTo(Member other) {
+        return Integer.compare(other.borrowedCount, this.borrowedCount);
+    }
+
     public String toString() {
-        return getClass().getSimpleName()
-                + "{id='" + memberId
-                + "', name='" + name
-                + "', borrowedCount=" + borrowedCount
-                + ", limit=" + maxBorrowLimit + "}";
+        return getClass().getSimpleName() + "{memberId='" + memberId + "', name='" + name + "', borrowed=" + borrowedCount + "/" + maxBorrowLimit + "}";
     }
 }

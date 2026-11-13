@@ -1,12 +1,14 @@
 package lms.model;
 
-public abstract class LibraryItem {
+import lms.Loanable;
+
+public abstract class LibraryItem implements Loanable {
     private String id;
     private String title;
     private boolean isBorrowed;
 
     public LibraryItem(String id, String title) {
-        setId(id);
+        this.id = id;
         setTitle(title);
         this.isBorrowed = false;
     }
@@ -23,37 +25,38 @@ public abstract class LibraryItem {
         return isBorrowed;
     }
 
-    public void setId(String id) {
-        if (id == null || id.isBlank()) {
-            throw new IllegalArgumentException("Id cannot be blank");
-        }
-        this.id = id;
-    }
-
     public void setTitle(String title) {
-        if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("Title cannot be blank");
+        if (title != null && !title.trim().isEmpty()) {
+            this.title = title;
+        } else {
+            this.title = "Unknown Title";
         }
-        this.title = title;
     }
 
-    public void borrowItem() {
-        isBorrowed = true;
+    public void loan(Member member) {
+        if (isBorrowed) {
+            System.out.println(title + " is already on loan.");
+        } else if (member.getBorrowedCount() >= member.getMaxBorrowLimit()) {
+            System.out.println(member.getName() + " has reached the maximum borrow limit.");
+        } else {
+            isBorrowed = true;
+            member.incrementBorrowedCount();
+            System.out.println(title + " loaned to " + member.getName());
+        }
     }
 
     public void returnItem() {
-        isBorrowed = false;
+        if (isBorrowed) {
+            isBorrowed = false;
+            System.out.println(title + " returned.");
+        } else {
+            System.out.println(title + " was not on loan.");
+        }
     }
-
-    public double calculateLateFee(int daysLate) {
-        return daysLate * 10.0;
-    }
+    public abstract double calculateLateFee(int daysLate);
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()
-                + "{id='" + id
-                + "', title='" + title
-                + "', borrowed=" + isBorrowed + "}";
+        return getClass().getSimpleName() + "{id='" + id + "', title='" + title + "', borrowed=" + isBorrowed + "}";
     }
 }
