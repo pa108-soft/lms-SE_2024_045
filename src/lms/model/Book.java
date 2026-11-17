@@ -12,9 +12,7 @@ public class Book extends LibraryItem implements Reservable {
         this.reservedBy = null;
     }
 
-    public String getAuthor() {
-        return author;
-    }
+    public String getAuthor() { return author; }
 
     public void setAuthor(String author) {
         if (author != null && !author.trim().isEmpty()) {
@@ -24,10 +22,12 @@ public class Book extends LibraryItem implements Reservable {
         }
     }
 
+    @Override
     public double calculateLateFee(int daysLate) {
         return daysLate * 10.0;
     }
 
+    @Override
     public void reserve(Member m) {
         if (isReserved()) {
             System.out.println(getTitle() + " is already reserved.");
@@ -37,6 +37,7 @@ public class Book extends LibraryItem implements Reservable {
         }
     }
 
+    @Override
     public void cancelReservation() {
         if (isReserved()) {
             System.out.println("Reservation cancelled for " + getTitle());
@@ -46,9 +47,8 @@ public class Book extends LibraryItem implements Reservable {
         }
     }
 
+    @Override
     public boolean isReserved() {
         return reservedBy != null;
     }
 }
-
-

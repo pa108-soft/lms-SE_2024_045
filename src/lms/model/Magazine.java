@@ -8,14 +8,10 @@ public class Magazine extends LibraryItem {
         this.issueNumber = issueNumber;
     }
 
-    public int getIssueNumber() {
-        return issueNumber;
-    }
+    public int getIssueNumber() { return issueNumber; }
+    public void setIssueNumber(int issueNumber) { this.issueNumber = issueNumber; }
 
-    public void setIssueNumber(int issueNumber) {
-        this.issueNumber = issueNumber;
-    }
-
+    @Override
     public double calculateLateFee(int daysLate) {
         return daysLate * 5.0;
     }
